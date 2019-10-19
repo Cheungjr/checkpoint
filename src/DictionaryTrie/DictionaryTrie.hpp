@@ -1,7 +1,9 @@
 /**
- * TODO: File Header
- *
- * Author:
+ * file name: DictionaryTrie.hpp
+ * author: Jiarun Zhang, Sizhe Qiu
+ * userid:  jiz727, siq001
+ * description:The class for a dictionary ADT,
+ * implemented as multiway trie.
  */
 #ifndef DICTIONARY_TRIE_HPP
 #define DICTIONARY_TRIE_HPP
@@ -19,17 +21,46 @@ using namespace std;
 class DictionaryTrie {
   private:
     // TODO: add private members and helper methods here
+    const int ALP_SIZE = 26;
+
+    class TrieNode{
+      public:
+	int freq;
+	int numChild;
+	struct TrieNode* children[ ALP_SIZE ];
+
+	TrieNode( int freq ):freq(freq){
+	  
+	  for( int i = 0; i < ALP_SIZE; i++){
+	    children[i] = nullptr;
+          }
+          numChild = 0;
+	}//end constructor of TrieNode
+    };
+    TrieNode* root;
+      
+    //helper method to delete nodes recursively.
+    static void deleteAll( TrieNode* node ) {
+      if(node != nullptr && node->numChild == 0 ){
+        delete node;
+      }else{
+	for( int i = 0; i < ALP_SIZE; i++){
+	  deleteAll(node->children[i];
+        }
+      }
+    }
+
   public:
-    /* TODO: add function header */
+    /* constructor */
     DictionaryTrie();
 
-    /* TODO: add function header */
+    /* insert method  */
     bool insert(string word, unsigned int freq);
 
-    /* TODO: add function header */
+    /* find method*/
     bool find(string word) const;
 
-    /* TODO: add function header */
+    /* predict completion */
     vector<string> predictCompletions(string prefix,
                                       unsigned int numCompletions);
 
@@ -37,7 +68,7 @@ class DictionaryTrie {
     vector<string> predictUnderscores(string pattern,
                                       unsigned int numCompletions);
 
-    /* TODO: add function header */
+    /* Destructor of DictionaryTrie */
     ~DictionaryTrie();
 };
 
