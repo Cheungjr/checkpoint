@@ -37,6 +37,8 @@ class DictionaryTrie {
           numChild = 0;
 	}//end constructor of TrieNode
     };
+
+    //root node of Dictionary.
     TrieNode* root;
       
     //helper method to delete nodes recursively.
@@ -45,11 +47,39 @@ class DictionaryTrie {
         delete node;
       }else{
 	for( int i = 0; i < ALP_SIZE; i++){
-	  deleteAll(node->children[i];
+	  deleteAll( node->children[i] );
         }
       }
     }
 
+    //helper method for predict completion
+    void completionHelper( TrieNode* node, string prefix,
+	                                  vector< pair<string,int> > &preComple ){
+      if( node->freq > 0 ){
+        pair<string,int> predictPair( prefix, node->freq );
+
+        preComple.push_back( predictPair );
+      }
+      
+      for( int i = 0; i < ALP_SIZE; i ++ ){
+        if( node->children[i] ){
+	  string s = prefix + (char)('a'+i);
+          completionHelper( node->children[i], s, preComple );
+	}
+
+      }
+
+
+
+    }//end completionHelper
+    
+
+    //compare method for pair<string,int>
+    bool comparePair(const pair<int, int>&i, const pair<int, int>&j) {
+      return i.second < j.second;
+    }
+  
+    
   public:
     /* constructor */
     DictionaryTrie();

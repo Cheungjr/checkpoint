@@ -33,6 +33,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
     int index = word[i] - 'a'; 
     if (!temp->children[index]){
       temp->children[index] = new TrieNode(0);
+      temp->numChild ++;
     }
 
     temp = temp->children[index];
@@ -66,11 +67,49 @@ bool DictionaryTrie::find(string word) const {
   return ( temp != NULL && temp->freq > 0); 	
 }
 
-/* TODO */
+/**
+ * func name:predictCompletions( string prefix,
+ *                    unsigned int numCompletions )
+ *
+ * description: find whether the word is
+ *
+ * param string prefix, the prefix to predict complete word.
+ *
+ * param unsigned int numCompletions number of
+ *   words stored in predict completion list.
+ *
+ * return vector<string>
+ */
 vector<string> DictionaryTrie::predictCompletions(string prefix,
                                                   unsigned int numCompletions){
-    
-    return {};
+    TrieNode* temp = root;
+    vector<string> preComple;//the list of completions to return.
+
+    for( int i = 0; i < prefix.length(); i++){
+      int index = prefix[i] - 'a';
+      if( !temp->children[index]){
+	return preComple;
+      }
+
+      temp = temp->children[index];
+    }
+    vector<pair<string,int>> compleList 
+    completionHelper( temp, prefix, compleList); 
+
+    //sort the compleList
+    sort( compleList.begin(), compleList.end(), comparePair );
+    //push most frequent words into the list.
+    if( compleList.size() < numCompletions ){
+      for( int i = 0; i < compleList.size(); i++ ){
+	preComple.push_back( compleList[i].first );
+      }
+    }else{
+      for( int i = 0; i < numCompletions; i ++ ){
+	preComple.push_back( compleList[i].first );
+      } 
+    }
+
+    return preComple;
 }
 
 /* TODO */
