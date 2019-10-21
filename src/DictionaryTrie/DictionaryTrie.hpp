@@ -27,7 +27,9 @@ class DictionaryTrie {
       public:
 	int freq;
 	int numChild;
-	struct TrieNode* children[ ALP_SIZE ];
+	TrieNode** children = new TrieNode* [ALP_SIZE];
+
+ 	//struct TrieNode* children[ ALP_SIZE ];
 
 	TrieNode( int freq ):freq(freq){
 	  
