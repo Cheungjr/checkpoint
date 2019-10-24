@@ -7,10 +7,12 @@
  */
 #include "DictionaryTrie.hpp"
 #include <iostream>
+#include <string>
+#include <csstring>
 
 /* constructor of DictionaryTrie */
 DictionaryTrie::DictionaryTrie() {
-  root = new TrieNode(0);
+  this->root = nullptr;
 }
 
 /**
@@ -24,22 +26,73 @@ DictionaryTrie::DictionaryTrie() {
  */
 bool DictionaryTrie::insert(string word, unsigned int freq) {
   //if word already existed or null, return false.
-  if( find(word) || word == NULL){ return false;}
+  if( word.empty() || find(word) ){ return false; }
 
-  TrieNode* temp = root;
 
-  for( int i = 0; i < word.length(); i++){
-    
-    int index = word[i] - 'a'; 
-    if (!temp->children[index]){
-      temp->children[index] = new TrieNode(0);
-      temp->numChild ++;
+  int length = word.length();
+  //get the char string
+  char cstr[length + 1];
+  strcpy(cstr, &word[0]);
+  
+  TrieNode* curr = nullptr;
+ // TrieNode* temp = nullptr;
+  
+  //if the tree is empty
+  if(root == nullptr){
+    //set the root;
+    root = new TrieNode(cstr[0]);
+    curr = root;
+    //build the tri
+    for(int i = 1; i < length; i++){
+      curr->mid = new TrieNode(cstr[i]);
+      curr = curr->mid;
     }
-
-    temp = temp->children[index];
+  }else{
+    
+    //get the curr
+    curr = root;
+   // temp = curr;
+    for( int i = 0; i < length; i++ ){
+      //if char == node->data goto mid child
+      if(cstr[i] == curr->data){
+        //if the mid child is empty, insert all, break the i-loop, case x
+        if(curr->mid == nullptr){ 
+	  for(int j = i+1; j < length; j++){
+	    curr->mid = new TrieNode(cstr[j]);
+	    curr = curr->mid;
+	  }
+	  break;
+	}//mid child not empty, update curr, goto next i-loop
+	else{
+	  curr = curr->mid;
+	}
+      }//goto left
+      else if(cstr[i] < curr->data){
+        if( curr->left == nullptr ){
+	  curr->left = new TrieNode(cstr[i]);
+	  curr = curr->left;
+	  //let i loop go through [i] one more time to enter case x
+	  i --;
+	}//not empy, traverse left
+	else{
+	  curr = curr->left;
+	}
+      }//goto right
+      else{
+        if( curr->right == nullptr ){
+	  curr->right = new TrieNode(cstr[i]);
+	  curr = curr->right;
+	  //let i loop go through [i] one more time to enter case x
+	  i --;
+	}//not empy, traverse left
+	else{
+	  curr = curr->right;
+	}
+      }
+    }//end of i=loop
   }
-  //the frequency of the word;
-  temp->freq = freq;
+  //set frequency at the end
+  curr->freq = freq;
 
   return true;
 }
@@ -51,20 +104,14 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
  *
  * param string word, the word to find.
  *
- * return bool
+ * return true if find the word in the dic, false otherwise
  */
 bool DictionaryTrie::find(string word) const {
-  TrieNode* temp = root
   
-  for (int i = 0; i < word.length(); i++){ 
-    int index = word[i] - 'a'; 
-    if (!temp->children[index]) 
-        return false; 
-  
-    temp = temp->children[index]; 
-  } 
-  
-  return ( temp != NULL && temp->freq > 0); 	
+  if( word.empty() ){ return false; }
+  if( root == nullptr ){ return false; }
+  TrieNode* curr = root;
+  return findHelper(word, curr);
 }
 
 /**
@@ -82,17 +129,15 @@ bool DictionaryTrie::find(string word) const {
  */
 vector<string> DictionaryTrie::predictCompletions(string prefix,
                                                   unsigned int numCompletions){
-    TrieNode* temp = root;
-    vector<string> preComple;//the list of completions to return.
+  TrieNode* curr = root;
+  vector<string> predict;//the list of completions to return.
+  if( prefix.empty() || root == nullptr ){ return predict; }
 
-    for( int i = 0; i < prefix.length(); i++){
-      int index = prefix[i] - 'a';
-      if( !temp->children[index]){
-	return preComple;
-      }
-
-      temp = temp->children[index];
-    }
+  TriNode* curr = root;
+  // if the prefix not find in dic
+  if( findHelper(prefix, curr) == false ){
+    return predict;
+  }else{
     vector<pair<string,int>> compleList 
     completionHelper( temp, prefix, compleList); 
 
@@ -109,12 +154,15 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
       } 
     }
 
-    return preComple;
+    return preComplete;
+  }
 }
 
 /* TODO */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
+    //vector<string> preUnderscore;
+
     return {};
 }
 
