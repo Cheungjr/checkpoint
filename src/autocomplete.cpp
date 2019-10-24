@@ -75,10 +75,10 @@ int main(int argc, char** argv) {
         cout << "Enter a number of completions:" << endl;
         cin >> numberOfCompletions;
 
-	results = dt->predictCompletions(word, numberofCompletions);
+	results = dt->predictCompletions(word, numberOfCompletions);
 
         //print out results
-	for( int i = 0; i < numberofCompletions; i++ ){ 
+	for( int i = 0; i < numberOfCompletions; i++ ){ 
 	    cout << results[i] << endl;
 	}
 

@@ -114,10 +114,12 @@ bool DictionaryTrie::find(string word) const {
   TrieNode* curr = root;
   return findHelper(word, curr);
 }
-    //compare method for pair<string,int>
-      bool comparePair(const pair<string, int>&i, const pair<string, int>&j) {
-        return i.second < j.second;
-      }
+    
+//helper method to compare method for pair<string,int>
+bool comparePair(const pair<string, int>&i, const pair<string, int>&j) {
+  return i.second < j.second;
+}
+
 
 /**
  * func name:predictCompletions( string prefix,
