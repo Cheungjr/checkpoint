@@ -67,13 +67,20 @@ int main(int argc, char** argv) {
 
     char cont = 'y';
     unsigned int numberOfCompletions;
+    vector<string> results;
+
     while (cont == 'y') {
         cout << "Enter a prefix/pattern to search for:" << endl;
         getline(cin, word);
         cout << "Enter a number of completions:" << endl;
         cin >> numberOfCompletions;
 
-        // TODO
+	results = dt->predictCompletions(word, numberofCompletions);
+
+        //print out results
+	for( int i = 0; i < numberofCompletions; i++ ){ 
+	    cout << results[i] << endl;
+	}
 
         cout << "Continue? (y/n)" << endl;
         cin >> cont;
