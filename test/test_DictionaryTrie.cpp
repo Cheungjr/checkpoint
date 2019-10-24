@@ -28,10 +28,10 @@ TEST(DictTrieTests, EMPTY_TEST) {
 //test insert function
 TEST(DictTrieTests, INSERT__TEST_01) {
     DictionaryTrie dict;
-    dict.insert("o", 10 );
-    ASSERT_EQ(dict.find("o"), true );
+    dict.insert("obama", 10 );
+    ASSERT_EQ(dict.find("obama"), true );
 }
-/**
+
 //test insert a list of words and find
 TEST(DictTrieTests, INSERT_TEST_02) {
     DictionaryTrie dict;
@@ -94,7 +94,8 @@ TEST(DictTrieTests, INSERT_UPPCASE) {
     dict.insert( "doesn` t",9);
     
 
-    ASSERT_EQ(dict.find("dog"), true);
+    ASSERT_EQ(dict.find("doG"), true);
+    ASSERT_EQ(dict.find("dog"), false);
     ASSERT_EQ(dict.find("doesn` t"), true);
     ASSERT_EQ(dict.find("ForeSt"), true);
     ASSERT_EQ(dict.find("GooglE"), true);
@@ -123,7 +124,7 @@ TEST(DictTrieTests, SUBSET_WORDS ) {
     ASSERT_EQ(dict.find("abcdefghijk"), true);
 }
 
-//test autoCompletion function.
+/*test autoCompletion function.
 TEST(DictTrieTests, AUTOCOMPLE_TEST_01 ) {
     DictionaryTrie dict;
     vector<string> autoComplete;
@@ -148,6 +149,7 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_01 ) {
 
 
 }
+*/
 
 //test autoComplete
 //apple,5; add,6; delete,10; deer,6;demon,10; applet,10;apply,9;
@@ -171,4 +173,23 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_02) {
     ASSERT_EQ(autoComplete[0], "applet" );
     ASSERT_EQ(autoComplete[1], "apply" );
     ASSERT_EQ(autoComplete[2], "apple" );
-}*/
+}
+
+
+TEST(DictTrieTests, AUTOCOMPLE_TEST_03) {
+    DictionaryTrie dict;
+    vector<string> autoComplete;
+
+    dict.insert("apfle",5);
+    dict.insert("add",6);
+    dict.insert("be",10);
+    dict.insert("apfly",9);
+
+    
+    autoComplete = dict.predictCompletions("apf",4);
+    ASSERT_EQ(dict.find("apfle"), true);
+    ASSERT_EQ(autoComplete.size(), 2 );
+
+    ASSERT_EQ(autoComplete[0], "apfly" );
+    ASSERT_EQ(autoComplete[1], "apfle" );
+}

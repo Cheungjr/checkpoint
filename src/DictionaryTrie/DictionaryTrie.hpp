@@ -46,50 +46,34 @@ class DictionaryTrie {
   TrieNode * root;
   
   /**
-   * func name: findHelper( string word )
+   * func name: findH( string word )
    * description: find whether the word is stored in DictionaryTrie.
    * param: string word - the word to find.
    *	    curr - the ptr pointing to where to start the find
+   *	    index index of char in word
    * return true if find the word in the dic, false otherwise
    */
-  bool findHelper(string word, TrieNode* curr) const {
-  
-    int length = word.length();
-    //get the char string
-    char cstr[length + 1];
-    strcpy(cstr, &word[0]);
-	
-    //find the anchor point
-    while( cstr[0] != curr->data ){
-      //goto the left child
-      if( cstr[0] < curr->data && curr->left){
-        curr = curr->left;
-      }//go right
-      else if( cstr[0] > curr->data && curr-> right ){
-        curr = curr->right;
-      }//not find
-      else{ return false; }
-    }//end of finding the anchor point
-	
-    // loop through each char
-    for( int i = 0;  i < length - 1; i ++){ 
-      if(cstr[i] == curr->data && curr->mid){
-      //set curr to mid child go for next char
-      curr = curr->mid;
-      }
-      if( cstr[0] < curr->data && curr->left){
-        curr = curr->left;
-      }//go right
-      else if( cstr[0] > curr->data && curr-> right ){
-        curr = curr->right;
-      }//not find
-      else{ return false; }
-    } 
-	  
-    //find  if the word in dic
-    return (curr->data == cstr[length-1] && curr->freq != 0);
-  }
 
+  bool findH( string word, TrieNode* curr, int index) const{
+    if( !curr ){ return false;}
+    int i = index;
+    if(word[i] < curr->data ){
+	    curr = curr->left;
+      return findH( word, curr, index );
+    }else if( word[i] > curr->data ){
+	    curr = curr->right;
+      return findH( word,curr, index);
+    }else{
+      i++;
+      if( i >= word.length() ){
+	return ( curr->freq != 0 );
+      }
+
+      curr = curr->mid;
+      return findH( word, curr, index + 1);
+    }
+
+  }
     //helper method to delete nodes recursively.
     static void deleteAll( TrieNode* node ) {
       if(!node){ return; }
@@ -101,31 +85,33 @@ class DictionaryTrie {
     
     //helper method for predict completion
     void completionHelper( TrieNode* node, string prefix,
-	                                vector< pair<string,int> > &preComple ){
+	                                vector< pair<string,int> > &preComple,bool first ){
       //return case
       if(!node){ return; }
-
+      
+      pair<string,int> predictPair;
       //concate word, freq>0 means word exist, push into vector
       if( node->freq > 0 ){
-        pair<string,int> predictPair( prefix, node->freq );
+        if(first) predictPair = pair<string, int>( prefix, node->freq );
+	else  predictPair = pair<string, int>( prefix+node->data, node->freq );
 
         preComple.push_back( predictPair );
       }
-      string s;
+      string s = prefix;
       //recursion call to do DFS and concate the possible word
       if( node->left ){
-	s = prefix + node->data;
-        completionHelper( node->left, s, preComple );
+      	//if(!first ) s = prefix + node->data;
+        completionHelper( node->left, s, preComple, false );
       }
       if( node->right ){
-	s = prefix + node->data;
-        completionHelper( node->right, s, preComple );
+	//if(!first) s = prefix + node->data;
+        completionHelper( node->right, s, preComple, false );
       }
       if( node->mid ){
-	s = prefix + node->data;
-        completionHelper( node->mid, s, preComple );
+	if(!first) s = prefix + node->data;
+        completionHelper( node->mid, s, preComple, false );
       }
-
+       
     }//end completionHelper
     
 

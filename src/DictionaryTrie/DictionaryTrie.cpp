@@ -28,74 +28,56 @@ DictionaryTrie::DictionaryTrie() {
 bool DictionaryTrie::insert(string word, unsigned int freq) {
   //if word already existed or null, return false.
   if( word.empty() || find(word) ){ return false; }
-
-
-  int length = word.length();
-  //get the char string
-  char cstr[length + 1];
-  strcpy(cstr, &word[0]);
-  
-  TrieNode* curr = nullptr;
- // TrieNode* temp = nullptr;
-  
-  //if the tree is empty
-  if(root == nullptr){
-    //set the root;
-    root = new TrieNode(cstr[0]);
-    curr = root;
-    //build the tri
-    for(int i = 1; i < length; i++){
-      curr->mid = new TrieNode(cstr[i]);
-      curr = curr->mid;
+  if( !root ) {
+    unsigned char c = word[0];
+    root = new TrieNode(c);
+    TrieNode* curr = root;
+    for( int i = 1; i < word.length(); i++ ){
+      unsigned char a = word[i];
+      curr->mid = new TrieNode(a);
+      curr= curr->mid;
     }
-  }else{
-    
-    //get the curr
-    curr = root;
-   // temp = curr;
-    for( int i = 0; i < length; i++ ){
-      //if char == node->data goto mid child
-      if(cstr[i] == curr->data){
-        //if the mid child is empty, insert all, break the i-loop, case x
-        if(curr->mid == nullptr){ 
-	  for(int j = i+1; j < length; j++){
-	    curr->mid = new TrieNode(cstr[j]);
-	    curr = curr->mid;
-	  }
-	  break;
-	}//mid child not empty, update curr, goto next i-loop
-	else{
-	  curr = curr->mid;
-	}
-      }//goto left
-      else if(cstr[i] < curr->data){
-        if( curr->left == nullptr ){
-	  curr->left = new TrieNode(cstr[i]);
-	  curr = curr->left;
-	  //let i loop go through [i] one more time to enter case x
-	  i --;
-	}//not empy, traverse left
-	else{
-	  curr = curr->left;
-	}
-      }//goto right
-      else{
-        if( curr->right == nullptr ){
-	  curr->right = new TrieNode(cstr[i]);
-	  curr = curr->right;
-	  //let i loop go through [i] one more time to enter case x
-	  i --;
-	}//not empy, traverse left
-	else{
-	  curr = curr->right;
-	}
-      }
-    }//end of i=loop
+    curr->freq++;
+    return true;
   }
-  //set frequency at the end
-  curr->freq = freq;
 
-  return true;
+  TrieNode* curr = root;
+  int i = 0;
+  while( curr&& i < word.length() ){
+    char s = word[i];
+    if( curr->data < s ){
+      if(! curr->right ){
+	curr->right = new TrieNode(s);
+	curr = curr->right;
+      }else{
+	curr = curr->right;
+      }
+    }else if( curr->data > s){
+      if(!curr->left){
+	curr->left = new TrieNode(s);
+	curr = curr->left;
+      }else{
+	curr = curr->left;
+      }
+    }else{
+      if( i == word.length() - 1 ){
+	curr->freq++;
+	return true;
+      }
+      if( curr->mid){
+	curr=curr->mid;
+	i++;
+      }else{
+	i++;
+	s=word[i];
+	curr->mid = new TrieNode(s);
+	curr = curr->mid;
+      }
+    }
+  }//end while
+
+
+  return false;
 }
 
 /**
@@ -112,7 +94,7 @@ bool DictionaryTrie::find(string word) const {
   if( word.empty() ){ return false; }
   if( root == nullptr ){ return false; }
   TrieNode* curr = root;
-  return findHelper(word, curr);
+  return findH(word, curr, 0);
 }
     
 //helper method to compare method for pair<string,int>
@@ -137,31 +119,54 @@ bool comparePair(const pair<string, int>&i, const pair<string, int>&j) {
 vector<string> DictionaryTrie::predictCompletions(string prefix,
                                                   unsigned int numCompletions){
   TrieNode* curr = root;
+  TrieNode* anchor;
   vector<string> predict;//the list of completions to return.
+  int length = prefix.length();
+  int i = 0;
   if( prefix.empty() || root == nullptr ){ return predict; }
-
-  // if the prefix not find in dic
-  if( findHelper(prefix, curr) == false ){
-    return predict;
-  }else{
-    vector<pair<string,int>> compleList; 
-    completionHelper( curr, prefix, compleList); 
-
-    //sort the compleList
-    sort( compleList.begin(), compleList.end(), comparePair );
-    //push most frequent words into the list.
-    if( compleList.size() < numCompletions ){
-      for( int i = 0; i < compleList.size(); i++ ){
-	predict.push_back( compleList[i].first );
-      }
-    }else{
-      for( int i = 0; i < numCompletions; i ++ ){
-	predict.push_back( compleList[i].first );
-      } 
+  
+  while( curr && i < length){
+    if(prefix[i] < curr->data){
+      if(!curr->left){ return predict; }
+      curr = curr->left;
     }
-
-    return predict;
+    else if(prefix[i] > curr->data){
+      if(!curr->right){ return predict; }
+      curr = curr->right;
+    }
+    else{
+      if(i == length -1) { 
+        anchor = curr; 
+	break;
+      }
+      curr = curr->mid;
+      i++;
+    }
   }
+  if(i >= length) { return predict; }
+
+  vector<pair<string,int>> compleList; 
+  completionHelper( anchor, prefix, compleList, true); 
+
+  //sort the compleList
+  sort( compleList.begin(), compleList.end(), comparePair );
+  //push most frequent words into the list.
+  if( compleList.size() < numCompletions ){
+    for( int i = 0; i < compleList.size(); i++ ){
+      predict.push_back( compleList[i].first );
+    }
+  }else{
+    for( int i = 0; i < numCompletions; i ++ ){
+      predict.push_back( compleList[i].first );
+    } 
+  }
+  string temp;
+  for(int i = 0; i < predict.size()/2; i ++){
+	  temp = predict[i];
+	 predict[i] = predict[predict.size()-i-1];
+	predict[predict.size()-i-1] = temp;
+  }	
+  return predict;
 }
 
 /* TODO */
