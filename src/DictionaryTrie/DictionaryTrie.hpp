@@ -11,6 +11,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdio.h>
+#include <cstring>
 
 using namespace std;
 
@@ -23,30 +25,26 @@ class DictionaryTrie {
 
     class TrieNode{
       public:
-	TriNode * left;
-	TriNode * mid;
-	TriNode * right;
+	TrieNode * left;
+	TrieNode * mid;
+	TrieNode * right;
 	//if acceptable
 	bool state;
 	unsigned int freq;
 	char data;
 	
-	TrieNode(char data) :data(Data){
+	TrieNode(char data) :data(data){
 	  left = mid = right = nullptr;
 	  state = false;
 	  freq = 0;
 	};
 
-  /*
-   * func name: getFreq()
-   * description: get the freqency of the word
-   * param:TrieNode* node - node representing last char of a word
-   * return: 0 for not in struct, freqency otherwise
-   */
-  //int getFreq( TrieNode* node ){
-  //  return freq;
-  //}
-
+      
+    };
+  
+  //root node of Dictionary.
+  TrieNode * root;
+  
   /**
    * func name: findHelper( string word )
    * description: find whether the word is stored in DictionaryTrie.
@@ -54,7 +52,7 @@ class DictionaryTrie {
    *	    curr - the ptr pointing to where to start the find
    * return true if find the word in the dic, false otherwise
    */
-  bool DictionaryTrie::findHelper(string word, TrieNode* curr) const {
+  bool findHelper(string word, TrieNode* curr) const {
   
     int length = word.length();
     //get the char string
@@ -74,7 +72,7 @@ class DictionaryTrie {
     }//end of finding the anchor point
 	
     // loop through each char
-    for( int 1 = 0;  i < length - 1; i ++){ 
+    for( int i = 0;  i < length - 1; i ++){ 
       if(cstr[i] == curr->data && curr->mid){
       //set curr to mid child go for next char
       curr = curr->mid;
@@ -89,29 +87,18 @@ class DictionaryTrie {
     } 
 	  
     //find  if the word in dic
-    return (curr->data == cstr[height-1] && curr->freq != 0);
+    return (curr->data == cstr[length-1] && curr->freq != 0);
   }
-	/*
-	 * func name: compare()
-	 * description: helper method to compare the given char with data
-	 * param: char input - the char to compare
-	 * return: -1 for smaller, 0 for same, 1 for bigger
-	 */
-	//int compare(char input){
-	//  this.
-	//}
-	
-    };
 
     //helper method to delete nodes recursively.
     static void deleteAll( TrieNode* node ) {
-      if(!root){ return; }
+      if(!node){ return; }
       if( node->left != nullptr ){ deleteAll( node->left ); }
       if( node->mid != nullptr ){ deleteAll( node->mid ); }
       if( node->right != nullptr ){ deleteAll( node->right ); }
       delete node;
     }
-
+    
     //helper method for predict completion
     void completionHelper( TrieNode* node, string prefix,
 	                                vector< pair<string,int> > &preComple ){
@@ -139,19 +126,10 @@ class DictionaryTrie {
         completionHelper( node->mid, s, preComple );
       }
 
-      }
-
     }//end completionHelper
     
 
-    //compare method for pair<string,int>
-    bool comparePair(const pair<int, int>&i, const pair<int, int>&j) {
-      return i.second < j.second;
-    }
   
-    //root node of Dictionary.
-    TrieNode* root;
-      
     
   public:
     /* constructor */
@@ -172,7 +150,7 @@ class DictionaryTrie {
                                       unsigned int numCompletions);
 
     /* Destructor of DictionaryTrie */
-    ~DictionaryTrie()
+    ~DictionaryTrie();
 };
 
 #endif  // DICTIONARY_TRIE_HPP

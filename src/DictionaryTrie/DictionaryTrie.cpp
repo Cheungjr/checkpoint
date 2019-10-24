@@ -8,7 +8,8 @@
 #include "DictionaryTrie.hpp"
 #include <iostream>
 #include <string>
-#include <csstring>
+#include <algorithm>
+using namespace std;
 
 /* constructor of DictionaryTrie */
 DictionaryTrie::DictionaryTrie() {
@@ -113,6 +114,10 @@ bool DictionaryTrie::find(string word) const {
   TrieNode* curr = root;
   return findHelper(word, curr);
 }
+    //compare method for pair<string,int>
+      bool comparePair(const pair<string, int>&i, const pair<string, int>&j) {
+        return i.second < j.second;
+      }
 
 /**
  * func name:predictCompletions( string prefix,
@@ -133,28 +138,27 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
   vector<string> predict;//the list of completions to return.
   if( prefix.empty() || root == nullptr ){ return predict; }
 
-  TriNode* curr = root;
   // if the prefix not find in dic
   if( findHelper(prefix, curr) == false ){
     return predict;
   }else{
-    vector<pair<string,int>> compleList 
-    completionHelper( temp, prefix, compleList); 
+    vector<pair<string,int>> compleList; 
+    completionHelper( curr, prefix, compleList); 
 
     //sort the compleList
     sort( compleList.begin(), compleList.end(), comparePair );
     //push most frequent words into the list.
     if( compleList.size() < numCompletions ){
       for( int i = 0; i < compleList.size(); i++ ){
-	preComple.push_back( compleList[i].first );
+	predict.push_back( compleList[i].first );
       }
     }else{
       for( int i = 0; i < numCompletions; i ++ ){
-	preComple.push_back( compleList[i].first );
+	predict.push_back( compleList[i].first );
       } 
     }
 
-    return preComplete;
+    return predict;
   }
 }
 
