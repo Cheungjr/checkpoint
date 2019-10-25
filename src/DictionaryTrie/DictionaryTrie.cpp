@@ -172,9 +172,9 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 /* TODO */
 std::vector<string> DictionaryTrie::predictUnderscores(
     string pattern, unsigned int numCompletions) {
-    //vector<string> preUnderscore;
+    vector<string> preUnderscore;
 
-    return {};
+    return preUnderscore;
 }
 
 

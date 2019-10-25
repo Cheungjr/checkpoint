@@ -193,3 +193,29 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_03) {
     ASSERT_EQ(autoComplete[0], "apfly" );
     ASSERT_EQ(autoComplete[1], "apfle" );
 }
+
+TEST(DictTrieTests, UNDERSCORE) {
+    DictionaryTrie dict;
+    vector<string> under_1;
+    vector<string> under_2;
+
+    dict.insert("door",10);
+    dict.insert("deer",2);
+    dict.insert("insect",5);
+    dict.insert("insert",6);
+    dict.insert("intern",7);
+
+
+    under_1 = dict.predictUnderscores("d__r",2);
+    under_2 = dict.predictUnderscores("in____",2);
+
+    ASSERT_EQ( under_1.size(), 2);
+    ASSERT_EQ( under_2.size(), 2);
+
+    
+    ASSERT_EQ( under_2[0], "insert");
+    ASSERT_EQ( under_2.[1], "intern");
+    ASSERT_EQ( under_1.[0], "deer");
+    ASSERT_EQ( under_1.[1], "door");
+
+}
