@@ -17,8 +17,7 @@
 using namespace std;
 
 /**
- * The class for a dictionary ADT, implemented as either
- * a mulit-way trie or a ternary search tree.
+ * The class for a dictionary ADT, implemented as ternary search tree.
  */
 class DictionaryTrie {
   private:
@@ -85,13 +84,15 @@ class DictionaryTrie {
     
     //helper method for predict completion
     void completionHelper( TrieNode* node, string prefix,
-	                                vector< pair<string,int> > &preComple,bool first ){
+	                     vector< pair<string,int> > &preComple,bool first ){
       //return case
       if(!node){ return; }
       
       pair<string,int> predictPair;
       //concate word, freq>0 means word exist, push into vector
       if( node->freq > 0 ){
+        //cause curr is on the last node of prefix when first entering
+	//should void the case of adding the last char twice
         if(first) predictPair = pair<string, int>( prefix, node->freq );
 	else  predictPair = pair<string, int>( prefix+node->data, node->freq );
 
@@ -99,11 +100,13 @@ class DictionaryTrie {
       }
       string s = prefix;
       //recursion call to do DFS and concate the possible word
-      if( node->left ){
+      //&& first for prefix's last char -> left/right child is actually not in
+      //the dic
+      if( node->left && !first && node != root){
       	//if(!first ) s = prefix + node->data;
         completionHelper( node->left, s, preComple, false );
       }
-      if( node->right ){
+      if( node->right && !first && node != root){
 	//if(!first) s = prefix + node->data;
         completionHelper( node->right, s, preComple, false );
       }

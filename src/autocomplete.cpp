@@ -1,5 +1,9 @@
-/*
- * TODO: File Header
+/**
+ * file name: DictionaryTrie.cpp
+ * author: Jiarun Zhang, Sizhe Qiu
+ * userid:  jiz727, siq001
+ * description:The class for a dictionary ADT,
+ * implemented as multiway trie.
  */
 #include <fstream>
 #include <iostream>
@@ -78,6 +82,9 @@ int main(int argc, char** argv) {
 	results = dt->predictCompletions(word, numberOfCompletions);
 
         //print out results
+	if( numberOfCompletions > results.size() ){
+	  numberOfCompletions = results.size();
+	}
 	for( int i = 0; i < numberOfCompletions; i++ ){ 
 	    cout << results[i] << endl;
 	}

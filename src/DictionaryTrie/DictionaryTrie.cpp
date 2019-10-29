@@ -37,7 +37,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
       curr->mid = new TrieNode(a);
       curr= curr->mid;
     }
-    curr->freq++;
+    curr->freq = freq;
     return true;
   }
 
@@ -61,7 +61,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
       }
     }else{
       if( i == word.length() - 1 ){
-	curr->freq++;
+	curr->freq = freq;
 	return true;
       }
       if( curr->mid){
@@ -99,7 +99,7 @@ bool DictionaryTrie::find(string word) const {
     
 //helper method to compare method for pair<string,int>
 bool comparePair(const pair<string, int>&i, const pair<string, int>&j) {
-  return i.second < j.second;
+  return make_pair(-i.second,i.first) < make_pair(-j.second,j.first);
 }
 
 
@@ -160,12 +160,6 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
       predict.push_back( compleList[i].first );
     } 
   }
-  string temp;
-  for(int i = 0; i < predict.size()/2; i ++){
-	  temp = predict[i];
-	 predict[i] = predict[predict.size()-i-1];
-	predict[predict.size()-i-1] = temp;
-  }	
   return predict;
 }
 

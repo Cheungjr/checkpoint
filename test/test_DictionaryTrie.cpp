@@ -31,7 +31,7 @@ TEST(DictTrieTests, INSERT__TEST_01) {
     dict.insert("obama", 10 );
     ASSERT_EQ(dict.find("obama"), true );
 }
-
+/*
 //test insert a list of words and find
 TEST(DictTrieTests, INSERT_TEST_02) {
     DictionaryTrie dict;
@@ -124,7 +124,7 @@ TEST(DictTrieTests, SUBSET_WORDS ) {
     ASSERT_EQ(dict.find("abcdefghijk"), true);
 }
 
-/*test autoCompletion function.
+//test autoCompletion function.
 TEST(DictTrieTests, AUTOCOMPLE_TEST_01 ) {
     DictionaryTrie dict;
     vector<string> autoComplete;
@@ -149,7 +149,7 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_01 ) {
 
 
 }
-*/
+
 
 //test autoComplete
 //apple,5; add,6; delete,10; deer,6;demon,10; applet,10;apply,9;
@@ -194,28 +194,46 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_03) {
     ASSERT_EQ(autoComplete[1], "apfle" );
 }
 
-TEST(DictTrieTests, UNDERSCORE) {
+
+
+TEST(DictTrieTests, UNDERSCORE_01) {
     DictionaryTrie dict;
-    vector<string> under_1;
-    vector<string> under_2;
+    vector<string> under;
 
-    dict.insert("door",10);
-    dict.insert("deer",2);
-    dict.insert("insect",5);
-    dict.insert("insert",6);
-    dict.insert("intern",7);
+    dict.insert("dipple",10);
+    dict.insert("apple",11);
+    dict.insert("nipple",5);
+    dict.insert("applet",6);
+    dict.insert("addition",9);
+    dict.insert("application",8);
+    dict.insert("wildcatStrike",17);
+    dict.insert("doesapply",11);
 
+    under = dict.predictUnderscores("",4);
 
-    under_1 = dict.predictUnderscores("d__r",2);
-    under_2 = dict.predictUnderscores("in____",2);
+}
+*/
 
-    ASSERT_EQ( under_1.size(), 2);
-    ASSERT_EQ( under_2.size(), 2);
+TEST(DictTrieTests, AUTOCOMPLE_TEST_02) {
+    DictionaryTrie dict;
+    vector<string> autoComplete;
+
+    dict.insert("apple",10);
+    dict.insert("appendix",20);
+    dict.insert("application",15);
+    dict.insert("add",100);
+    dict.insert("addiction", 50);
+    dict.insert("app", 30);
+    dict.insert("apply", 70);
+    dict.insert("applaz", 55);
+    dict.insert("applaa", 55);
+    dict.insert("applac", 55);
+    dict.insert("applaq", 55);
 
     
-    ASSERT_EQ( under_2[0], "insert");
-    ASSERT_EQ( under_2.[1], "intern");
-    ASSERT_EQ( under_1.[0], "deer");
-    ASSERT_EQ( under_1.[1], "door");
+    autoComplete = dict.predictCompletions("app",20);
+
+    ASSERT_EQ(autoComplete.size(), 9 );
+
 
 }
