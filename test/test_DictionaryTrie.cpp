@@ -31,7 +31,7 @@ TEST(DictTrieTests, INSERT__TEST_01) {
     dict.insert("obama", 10 );
     ASSERT_EQ(dict.find("obama"), true );
 }
-/*
+
 //test insert a list of words and find
 TEST(DictTrieTests, INSERT_TEST_02) {
     DictionaryTrie dict;
@@ -150,7 +150,6 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_01 ) {
 
 }
 
-
 //test autoComplete
 //apple,5; add,6; delete,10; deer,6;demon,10; applet,10;apply,9;
 TEST(DictTrieTests, AUTOCOMPLE_TEST_02) {
@@ -196,7 +195,7 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_03) {
 
 
 
-TEST(DictTrieTests, UNDERSCORE_01) {
+TEST(DictTrieTests, UNDERSCORE_04) {
     DictionaryTrie dict;
     vector<string> under;
 
@@ -212,9 +211,8 @@ TEST(DictTrieTests, UNDERSCORE_01) {
     under = dict.predictUnderscores("",4);
 
 }
-*/
 
-TEST(DictTrieTests, AUTOCOMPLE_TEST_02) {
+TEST(DictTrieTests, AUTOCOMPLE_TEST_05) {
     DictionaryTrie dict;
     vector<string> autoComplete;
 
@@ -234,6 +232,118 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_02) {
     autoComplete = dict.predictCompletions("app",20);
 
     ASSERT_EQ(autoComplete.size(), 9 );
+}
+
+
+//test for final submission
+//same frequency predcit complete
+TEST(DictTrieTests, AUTOCOMPLE_SAME_FREQ) {
+    DictionaryTrie dict;
+    vector<string> autoComplete;
+
+    dict.insert("thatand",5);
+    dict.insert("thatant",5);
+    dict.insert("thatend",5);
+    dict.insert("thatent",5);
+
+
+    autoComplete = dict.predictCompletions("that",3);
+
+    ASSERT_EQ(autoComplete[0], "thatand" );
+    ASSERT_EQ(autoComplete[1], "thatant" );
+    ASSERT_EQ(autoComplete[2], "thatend" );
+}
+
+//test predict underscore.
+TEST(DictTrieTests, UNDERSCORE_01 ) {
+    DictionaryTrie dict;
+    vector<string> under_1;
+    vector<string> under_2;
+
+    dict.insert("door",10);
+    dict.insert("deer",2);
+    dict.insert("insect",5);
+    dict.insert("insert",6);
+    dict.insert("intern",7);
+
+
+    under_1 = dict.predictUnderscores("d__r",2);
+    under_2 = dict.predictUnderscores("in____",2);
+
+    ASSERT_EQ( under_1.size(), 2);
+    ASSERT_EQ( under_2.size(), 2);
+
+    
+    ASSERT_EQ( under_2[0], "insert");
+    ASSERT_EQ( under_2[1], "intern");
+    ASSERT_EQ( under_1[0], "deer");
+    ASSERT_EQ( under_1[1], "door");
+
+}
+
+//___ple;end with sub word.
+TEST(DictTrieTests, UNDERSCORE_02) {
+    DictionaryTrie dict;
+    vector<string> under;
+
+    dict.insert("dipple",6);
+    dict.insert("aapple",10);
+    dict.insert("criple",8);
+    dict.insert("nipple",9);
+    dict.insert("temple",7);
+
+    under = dict.predictUnderscores("___ple",3);
+    ASSERT_EQ( under[0], "aapple");
+    ASSERT_EQ( under[1], "nipple");
+    ASSERT_EQ( under[2], "criple");
+
+}
+
+//test two under scores and alphabetical order.
+//____lie__
+TEST(DictTrieTests, TWO_UNDER) {
+    DictionaryTrie dict;
+    vector<string> under;
+    vector<string> und; 
+
+    dict.insert("loveliest",6);
+    dict.insert("loneliest",6);
+    dict.insert("unbelieve",4);
+    dict.insert("resilient",5);
+    dict.insert("ebullient",10);
+
+    under = dict.predictUnderscores("____lie__",3);
+    und = dict.predictUnderscores("____lie__",5);
+
+    ASSERT_EQ( under[0], "ebullient");
+    ASSERT_EQ( under[1], "loneliest");
+    ASSERT_EQ( under[2], "loveliest");
+
+    ASSERT_EQ( und[3], "resilient");
+    ASSERT_EQ( und[4], "unbelieve");
 
 
 }
+
+//test three under scores
+//__st_r____
+TEST(DictTrieTests, THREE_UNDER) {
+    DictionaryTrie dict;
+    vector<string> under;
+
+    dict.insert("historical",7);
+    dict.insert("restartjob",9);
+    dict.insert("dostirtank",6);
+
+    under = dict.predictUnderscores("__st_r____",3);
+    ASSERT_EQ( under[0], "restartjob");
+    ASSERT_EQ( under[1], "historical");
+    ASSERT_EQ( under[2], "dostirtank");
+
+
+}
+
+
+
+
+

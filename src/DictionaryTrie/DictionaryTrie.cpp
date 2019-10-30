@@ -163,10 +163,49 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
   return predict;
 }
 
-/* TODO */
+/**
+ * func name:predictUnderscores()
+ * description: find out possible words with pattern in dic
+ * param: pattern - the string pattern want to find
+ *        numCompletions - number of words need to find 
+ *        preUnderscore - the vector to store all the possible match
+ * return: vector<string>
+ */
 std::vector<string> DictionaryTrie::predictUnderscores(
-    string pattern, unsigned int numCompletions) {
-    vector<string> preUnderscore;
+    				string pattern, unsigned int numCompletions) {
+  vector<string> preUnderscore; //the list of underscore predictions  to return.
+  int length = pattern.length();
+  int i = 0;
+  if( pattern.empty() || root == nullptr ){ return preUnderscore; }
+  
+  vector<pair<string,int>> compleList;
+  vector<TrieNode*> anchors;
+  string result = "";
+  char flag = '_';
+  //call findNode helper to find all the anchor nodes
+  if( pattern[0] == flag ){
+    findNode( pattern[0], root, anchors, true );
+  }else{
+    findNode( pattern[0], root, anchors, false );
+  }
+
+  //call helper on all the anchor nodes
+  for( int i = 0; i < anchors.size(); i++ ){
+    underscoreHelper( anchors[i], pattern, 0, result, flag, compleList );
+  } 
+
+  //sort the compleList
+  sort( compleList.begin(), compleList.end(), comparePair );
+  //push most frequent words into the list.
+  if( compleList.size() < numCompletions ){
+    for( int i = 0; i < compleList.size(); i++ ){
+      preUnderscore.push_back( compleList[i].first );
+    }
+  }else{
+    for( int i = 0; i < numCompletions; i ++ ){
+      preUnderscore.push_back( compleList[i].first );
+    } 
+  }
 
     return preUnderscore;
 }

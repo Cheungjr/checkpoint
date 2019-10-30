@@ -78,8 +78,13 @@ int main(int argc, char** argv) {
         getline(cin, word);
         cout << "Enter a number of completions:" << endl;
         cin >> numberOfCompletions;
-
-	results = dt->predictCompletions(word, numberOfCompletions);
+	
+	//completion or underscore
+	if( word.find('_') != std::string::npos ){
+	  results = dt->predictUnderscores(word, numberOfCompletions);
+	}else{
+	  results = dt->predictCompletions(word, numberOfCompletions);
+	}
 
         //print out results
 	if( numberOfCompletions > results.size() ){
