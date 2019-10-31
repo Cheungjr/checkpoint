@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <queue>
 using namespace std;
 
 /* constructor of DictionaryTrie */
@@ -35,16 +36,25 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
     for( int i = 1; i < word.length(); i++ ){
       unsigned char a = word[i];
       curr->mid = new TrieNode(a);
+      curr->maxBelow = freq;//maxBelow update
       curr= curr->mid;
     }
+    curr->maxBelow = freq;
     curr->freq = freq;
     return true;
   }
+  
 
   TrieNode* curr = root;
   int i = 0;
   while( curr&& i < word.length() ){
     char s = word[i];
+    //maxBelow update
+    if( curr->maxBelow <= freq ){
+      curr->maxBelow = freq;
+    }
+
+
     if( curr->data < s ){
       if(! curr->right ){
 	curr->right = new TrieNode(s);
@@ -62,6 +72,7 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
     }else{
       if( i == word.length() - 1 ){
 	curr->freq = freq;
+	curr->maxBelow = freq;
 	return true;
       }
       if( curr->mid){
@@ -96,7 +107,7 @@ bool DictionaryTrie::find(string word) const {
   TrieNode* curr = root;
   return findH(word, curr, 0);
 }
-    
+
 //helper method to compare method for pair<string,int>
 bool comparePair(const pair<string, int>&i, const pair<string, int>&j) {
   return make_pair(-i.second,i.first) < make_pair(-j.second,j.first);
@@ -145,22 +156,40 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
   }
   if(i >= length) { return predict; }
 
-  vector<pair<string,int>> compleList; 
-  completionHelper( anchor, prefix, compleList, true); 
+  priority_queue < pair<string,int>, vector<pair<string,int>>, compareMin > compleQ;
+  //maxList is a min heap.
+  priority_queue <int,vector<int>, compareMinH > maxList;
+  
+  int max;
+  if(anchor->mid){
+    max = anchor->mid->maxBelow;
+  }else{
+    max = anchor->maxBelow;
+  }
+  maxList.push( max );
 
-  //sort the compleList
-  sort( compleList.begin(), compleList.end(), comparePair );
+  completionH( anchor, prefix, compleQ, maxList, true, max,numCompletions );
+
   //push most frequent words into the list.
-  if( compleList.size() < numCompletions ){
-    for( int i = 0; i < compleList.size(); i++ ){
-      predict.push_back( compleList[i].first );
+  int lenQ = compleQ.size();
+
+  if( lenQ < numCompletions ){
+    for( int i = 0; i < lenQ; i++ ){
+      predict.push_back( compleQ.top().first );
+      compleQ.pop();
     }
   }else{
     for( int i = 0; i < numCompletions; i ++ ){
-      predict.push_back( compleList[i].first );
+      predict.push_back( compleQ.top().first );
+      compleQ.pop();
     } 
   }
+
+  //need to reverse order of predict
+  //reverse( predict.begin(), predict.end() );
+
   return predict;
+
 }
 
 /**

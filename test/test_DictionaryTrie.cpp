@@ -195,24 +195,7 @@ TEST(DictTrieTests, AUTOCOMPLE_TEST_03) {
 
 
 
-TEST(DictTrieTests, UNDERSCORE_04) {
-    DictionaryTrie dict;
-    vector<string> under;
-
-    dict.insert("dipple",10);
-    dict.insert("apple",11);
-    dict.insert("nipple",5);
-    dict.insert("applet",6);
-    dict.insert("addition",9);
-    dict.insert("application",8);
-    dict.insert("wildcatStrike",17);
-    dict.insert("doesapply",11);
-
-    under = dict.predictUnderscores("",4);
-
-}
-
-TEST(DictTrieTests, AUTOCOMPLE_TEST_05) {
+TEST(DictTrieTests, AUTOCOMPLE_TEST_04) {
     DictionaryTrie dict;
     vector<string> autoComplete;
 
@@ -274,10 +257,10 @@ TEST(DictTrieTests, UNDERSCORE_01 ) {
     ASSERT_EQ( under_2.size(), 2);
 
     
-    ASSERT_EQ( under_2[0], "insert");
-    ASSERT_EQ( under_2[1], "intern");
-    ASSERT_EQ( under_1[0], "deer");
-    ASSERT_EQ( under_1[1], "door");
+    ASSERT_EQ( under_2[1], "insert");
+    ASSERT_EQ( under_2[0], "intern");
+    ASSERT_EQ( under_1[0], "door");
+    ASSERT_EQ( under_1[1], "deer");
 
 }
 

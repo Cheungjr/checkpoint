@@ -13,6 +13,8 @@
 #include <vector>
 #include <stdio.h>
 #include <cstring>
+#include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -28,14 +30,14 @@ class DictionaryTrie {
 	TrieNode * mid;
 	TrieNode * right;
 	//if acceptable
-	bool state;
 	unsigned int freq;
 	char data;
+	int maxBelow;
 	
 	TrieNode(char data) :data(data){
 	  left = mid = right = nullptr;
-	  state = false;
 	  freq = 0;
+	  maxBelow = 0;
 	};
 
       
@@ -43,6 +45,18 @@ class DictionaryTrie {
   
   //root node of Dictionary.
   TrieNode * root;
+
+    //sort for min heap
+    struct compareMin{
+      bool operator()(const pair<string, int>&i, const pair<string, int>&j)const{
+        return make_pair(-i.second,i.first) > make_pair(-j.second,j.first);
+      }
+    }; 
+    struct compareMinH{
+      bool operator()( const int &i, const int &j)const{
+        return (i > j);
+      }
+    };
   
   /**
    * func name: findH( string word )
@@ -108,7 +122,8 @@ class DictionaryTrie {
       if( node->right != nullptr ){ deleteAll( node->right ); }
       delete node;
     }
-    
+   
+
   /**
    * func name: completionHelper( )
    * description: helper method for auto complete that recurse on each node.
@@ -118,38 +133,178 @@ class DictionaryTrie {
    *        first - if it is first node after the prefix ( edge case )
    * return: void
    */
-  void completionHelper( TrieNode* node, string prefix,
-	                     vector< pair<string,int> > &preComple,bool first ){
-    //return case
-    if(!node){ return; }
-    
-    pair<string,int> predictPair;
-    //concate word, freq>0 means word exist, push into vector
-    if( node->freq > 0 ){
-      //cause curr is on the last node of prefix when first entering
-      //should void the case of adding the last char twice
-      if(first) predictPair = pair<string, int>( prefix, node->freq );
-      else predictPair = pair<string, int>( prefix+node->data, node->freq );
-      preComple.push_back( predictPair );
-    }
-    string s = prefix;
-    //recursion call to do DFS and concate the possible word
-    //&& first for prefix's last char -> left/right child is actually not in
-    //the dic
-    if( node->left && !first && node != root){
-      completionHelper( node->left, s, preComple, false );
-    }
-    if( node->right && !first && node != root){
-      completionHelper( node->right, s, preComple, false );
-    }
-    if( node->mid ){
-      if(!first) s = prefix + node->data;
-      completionHelper( node->mid, s, preComple, false );
-    }
-       
-  }//end completionHelper
-    
+    void completionH( TrieNode* node, string prefix,
+	             priority_queue <pair<string,int>, vector<pair<string,int>>,compareMin> &preComple,
+                     priority_queue <int, vector<int>, compareMinH> & maxList,
+	                 bool first, int maxium, int numC ){
 
+      if(!node) { return;}
+
+      if( preComple.size() > numC ){
+	preComple.pop(); //pop the smallest(min heap).
+      }
+
+      //add next max into pq.
+      //find the guess best n freq	
+      if( node->left && node->left->maxBelow != node->maxBelow && !first){
+	if(maxList.size() < numC){      
+          maxList.push( node->left->maxBelow);
+	}else{
+          if( node->left->maxBelow > maxList.top() ){
+	     maxList.pop();
+	     maxList.push( node->left->maxBelow );
+          }
+	}
+      }
+      if( node->right && node->right->maxBelow != node->maxBelow && !first){
+	if(maxList.size() < numC){      
+          maxList.push( node->right->maxBelow);
+	}else{
+          if( node->right->maxBelow > maxList.top() ){
+	     maxList.pop();
+	     maxList.push( node->right->maxBelow );
+          }
+	}
+      }
+      if( node->mid && node->mid->maxBelow != node->maxBelow ){
+	if(maxList.size() < numC){      
+          maxList.push( node->mid->maxBelow);
+	}else{
+          if( node->mid->maxBelow > maxList.top() ){
+	     maxList.pop();
+	     maxList.push( node->mid->maxBelow );
+          }
+	}
+      }
+
+      pair<string,int> prePair;
+
+      if( node->freq >0 ){
+	if(first) { prePair= pair<string,int>( prefix, node->freq );}
+	else{ prePair=pair<string,int> (prefix + node->data, node->freq );}
+
+	preComple.push( prePair);
+      }
+
+      string s = prefix;
+
+      //get the best max for 3 children
+      int leftMax;
+      int rightMax;
+      int midMax;
+      if( node-> left){
+        leftMax = node->left->maxBelow;
+      }else{ leftMax = 0; }
+      if( node-> right){
+        rightMax = node->right->maxBelow;
+      }else{ rightMax = 0; }
+      if( node-> mid){
+        midMax = node->mid->maxBelow;
+      }else{ midMax = 0; }
+
+      int bestMax = max(max(leftMax,rightMax),midMax);
+      string str = s;
+	
+      //goto best max subtree first
+      if(bestMax == leftMax){
+        if( node->left){
+          if( node->left->maxBelow >= maxList.top() && !first && node!=root){
+	     completionH( node->left,s,preComple,maxList,false,maxium,numC);
+          }
+        }//recurse left	
+	//find the second best from the rest of the two
+	if( max(rightMax, midMax) == rightMax ){
+	  //right is 2
+          if( node->right){
+            if( node->right->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->right,s,preComple,maxList,false,maxium,numC);
+            }
+          }//recurse right
+          if( node->mid){
+            if( node->mid->maxBelow >= maxList.top() ){
+	      if(!first) s = prefix + node->data;
+              completionH( node->mid, s, preComple,maxList, false,maxium,numC );
+            }
+          }//recurse mid
+	}else{
+          if( node->mid){
+            if( node->mid->maxBelow >= maxList.top() ){
+	      if(!first) str = prefix + node->data;
+              completionH( node->mid, str, preComple,maxList, false,maxium,numC );
+            }
+          }//recurse mid
+          if( node->right){
+            if( node->right->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->right,s,preComple,maxList,false,maxium,numC);
+            }
+          }//recurse right
+	}
+      }else if(bestMax == rightMax){
+        if( node->right){
+          if( node->right->maxBelow >= maxList.top() && !first && node!=root){
+	     completionH( node->right,s,preComple,maxList,false,maxium,numC);
+          }
+        }//recurse right
+	if( max(leftMax, midMax) == leftMax ){
+	  //left is 2
+          if( node->left){
+            if( node->left->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->left,s,preComple,maxList,false,maxium,numC);
+            }
+	  }//recuese left
+          if( node->mid){
+            if( node->mid->maxBelow >= maxList.top() ){
+	      if(!first) str = prefix + node->data;
+              completionH( node->mid, str, preComple,maxList, false,maxium,numC );
+            }
+          }//recurse mid
+	}else{
+          if( node->mid){
+            if( node->mid->maxBelow >= maxList.top() ){
+	      if(!first) str = prefix + node->data;
+              completionH( node->mid, str, preComple,maxList, false,maxium,numC );
+            }
+          }//recurse mid
+          if( node->left){
+            if( node->left->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->left,s,preComple,maxList,false,maxium,numC);
+            }
+	  }//recuese left
+	}
+      }else{
+        if( node->mid){
+          if( node->mid->maxBelow >= maxList.top() ){
+	    if(!first) str = prefix + node->data;
+            completionH( node->mid, str, preComple,maxList, false,maxium,numC );
+          }
+        }//recurse mid
+	if( max(leftMax, rightMax) == leftMax ){
+          if( node->left){
+            if( node->left->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->left,s,preComple,maxList,false,maxium,numC);
+            }
+	  }//recuese left
+          if( node->right){
+            if( node->right->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->right,s,preComple,maxList,false,maxium,numC);
+            }
+          }//recurse right
+	}else{
+          if( node->right){
+            if( node->right->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->right,s,preComple,maxList,false,maxium,numC);
+            }
+          }//recurse right
+          if( node->left){
+            if( node->left->maxBelow >= maxList.top() && !first && node!=root){
+	       completionH( node->left,s,preComple,maxList,false,maxium,numC);
+            }
+	  }//recuese left/*
+	}
+      }
+
+    }
+		    
   /**
    * func name: underscoreHelper( )
    * description: find whether the word is stored in DictionaryTrie. edge case 
@@ -176,7 +331,7 @@ class DictionaryTrie {
         preUnderscore.push_back( predictPair );
       }
       //if the last char is an underscore, all nodes with >1 freq would work
-      if( pattern[index] == flag){
+      if( pattern[index] == flag ){
         vector<TrieNode*> temp;
         findNode(pattern[index], node, temp, true );
 	for( int i = 0; i < temp.size(); i ++ ){
@@ -187,33 +342,25 @@ class DictionaryTrie {
 	  }
 	}
       }
+      return;
     }
     //normal case, traverse to mid child
     if( node->data == pattern[index] ){
-      result = result + node->data;
-      underscoreHelper( node->mid, pattern, index + 1, result, 
+      underscoreHelper( node->mid, pattern, index + 1, result + node->data, 
       						flag, preUnderscore );
     }//if looking at a flag, traverse down
-    else if( pattern[index] == flag ){
-      result = result + node->data;
-      underscoreHelper( node->mid, pattern, index + 1, result, 
+    else if( pattern[index] == flag && index != 0 ){
+      underscoreHelper( node->mid, pattern, index + 1, result + node->data, 
+      						flag, preUnderscore );
+      underscoreHelper(node->left, pattern, index, result, 
+      						flag, preUnderscore );
+      underscoreHelper(node->right, pattern, index, result, 
+      						flag, preUnderscore );
+    }else{
+      underscoreHelper( node->mid, pattern, index + 1, result + node->data, 
       						flag, preUnderscore );
     }//not fit, return
-    else{ return; }
-
-    //if the next pattern[index] is a '_', try all child
-    if( index < pattern.length() - 1 && pattern[index + 1] == flag ){
-      if( node->left ){
-        result = result + node->data;
-        underscoreHelper( node->left, pattern, index + 1, result, 
-						flag, preUnderscore );
-      }
-      if( node->right ){
-        result = result + node->data;
-        underscoreHelper( node->right, pattern, index + 1, result, 
-						flag, preUnderscore );
-      }
-    }
+    //else{ return; }
 
   }//end of underscore helper
     

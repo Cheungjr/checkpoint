@@ -1,0 +1,5 @@
+10 door
+2 deer
+5 insect
+6 insert
+7 intern

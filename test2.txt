@@ -15,5 +15,6 @@
 10 cpple
 50 zpple
 50 dpple
-100 appla
-200 applc
+100 applaa
+200 applca
+300 applea
