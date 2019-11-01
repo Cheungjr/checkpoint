@@ -212,16 +212,17 @@ std::vector<string> DictionaryTrie::predictUnderscores(
   string result = "";
   char flag = '_';
   //call findNode helper to find all the anchor nodes
-  if( pattern[0] == flag ){
-    findNode( pattern[0], root, anchors, true );
-  }else{
-    findNode( pattern[0], root, anchors, false );
-  }
+  //if( pattern[0] == flag ){
+ //   findNode( pattern[0], root, anchors, true );
+ // }else{
+ //   findNode( pattern[0], root, anchors, false );
+ // }
 
   //call helper on all the anchor nodes
-  for( int i = 0; i < anchors.size(); i++ ){
-    underscoreHelper( anchors[i], pattern, 0, result, flag, compleList );
-  } 
+  //for( int i = 0; i < anchors.size(); i++ ){
+  //  underscoreHelper( anchors[i], pattern, 0, result, flag, compleList );
+  //} 
+    underscoreHelper( root, pattern, 0, result, flag, compleList );
 
   //sort the compleList
   sort( compleList.begin(), compleList.end(), comparePair );

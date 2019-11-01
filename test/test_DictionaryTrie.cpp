@@ -276,6 +276,7 @@ TEST(DictTrieTests, UNDERSCORE_02) {
     dict.insert("temple",7);
 
     under = dict.predictUnderscores("___ple",3);
+    ASSERT_EQ( under.size(), 3);
     ASSERT_EQ( under[0], "aapple");
     ASSERT_EQ( under[1], "nipple");
     ASSERT_EQ( under[2], "criple");

@@ -140,9 +140,9 @@ class DictionaryTrie {
 
       if(!node) { return;}
 
-      if( preComple.size() > numC ){
-	preComple.pop(); //pop the smallest(min heap).
-      }
+      //if( preComple.size() > numC ){
+	//preComple.pop(); //pop the smallest(min heap).
+      //}
 
       //add next max into pq.
       //find the guess best n freq	
@@ -330,8 +330,8 @@ class DictionaryTrie {
         predictPair = pair<string, int>( result+node->data, node->freq );
         preUnderscore.push_back( predictPair );
       }
-      //if the last char is an underscore, all nodes with >1 freq would work
-      if( pattern[index] == flag ){
+      /*if the last char is an underscore, all nodes with >1 freq would work
+      if( pattern[index] == flag && index != 0 ){
         vector<TrieNode*> temp;
         findNode(pattern[index], node, temp, true );
 	for( int i = 0; i < temp.size(); i ++ ){
@@ -341,7 +341,19 @@ class DictionaryTrie {
             preUnderscore.push_back( predictPair );
 	  }
 	}
+      }*/
+      //if the and only if the first char is a flag
+      if(pattern[index] == flag && node->freq > 0){
+        predictPair = pair<string, int>( result+node->data, node->freq );
+        preUnderscore.push_back( predictPair );
       }
+      //go left and right to see if the accept node is on the side
+      //if(index != 0){
+        underscoreHelper(node->left, pattern, index, result, 
+      						flag, preUnderscore );
+        underscoreHelper(node->right, pattern, index, result, 
+      						flag, preUnderscore );
+      //}
       return;
     }
     //normal case, traverse to mid child
@@ -349,16 +361,22 @@ class DictionaryTrie {
       underscoreHelper( node->mid, pattern, index + 1, result + node->data, 
       						flag, preUnderscore );
     }//if looking at a flag, traverse down
-    else if( pattern[index] == flag && index != 0 ){
+    else if( pattern[index] == flag ){
       underscoreHelper( node->mid, pattern, index + 1, result + node->data, 
       						flag, preUnderscore );
       underscoreHelper(node->left, pattern, index, result, 
-      						flag, preUnderscore );
+     						flag, preUnderscore );
       underscoreHelper(node->right, pattern, index, result, 
       						flag, preUnderscore );
     }else{
-      underscoreHelper( node->mid, pattern, index + 1, result + node->data, 
+      //if(index != 0 ){
+        underscoreHelper(node->left, pattern, index, result, 
       						flag, preUnderscore );
+        underscoreHelper(node->right, pattern, index, result, 
+      						flag, preUnderscore );
+      //}
+     // underscoreHelper( node->mid, pattern, index + 1, result + node->data, 
+      //						flag, preUnderscore );
     }//not fit, return
     //else{ return; }
 

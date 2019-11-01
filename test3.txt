@@ -1,5 +1,11 @@
-10 door
-2 deer
-5 insect
-6 insert
-7 intern
+100 apple
+10 aa
+20 ba
+7 za
+8 ga
+9 ya
+10 da
+11 na
+12 ua
+13 ca
+14 la
