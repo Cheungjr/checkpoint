@@ -45,11 +45,20 @@ class DictionaryTrie {
   
   //root node of Dictionary.
   TrieNode * root;
-
+   /*
     //sort for min heap
     struct compareMin{
       bool operator()(const pair<string, int>&i, const pair<string, int>&j)const{
         return make_pair(-i.second,i.first) > make_pair(-j.second,j.first);
+      }
+    }; */
+    struct compareMin{
+      bool operator()(const pair<string, int>&i, const pair<string, int>&j)const{
+        if( i.second != j.second ){
+	  return i.second > j.second;
+        }
+
+	return i.first < j.first;
       }
     }; 
     struct compareMinH{
@@ -140,9 +149,10 @@ class DictionaryTrie {
 
       if(!node) { return;}
 
-      //if( preComple.size() > numC ){
-	//preComple.pop(); //pop the smallest(min heap).
-      //}
+      /*
+      if( preComple.size() > numC ){
+	preComple.pop(); //pop the smallest(min heap).
+      }*/
 
       //add next max into pq.
       //find the guess best n freq	
@@ -183,7 +193,19 @@ class DictionaryTrie {
 	if(first) { prePair= pair<string,int>( prefix, node->freq );}
 	else{ prePair=pair<string,int> (prefix + node->data, node->freq );}
 
-	preComple.push( prePair);
+        if( preComple.size() >= numC ){ 
+	  if( prePair.second > preComple.top().second ){
+	    preComple.pop();
+	    preComple.push( prePair );
+          }else if( prePair.second == preComple.top().second &&
+		    prePair.first < preComple.top().first){
+
+	    preComple.pop();
+	    preComple.push( prePair );
+	  }
+	}
+        //push when queue not filled.
+	preComple.push( prePair );
       }
 
       string s = prefix;
