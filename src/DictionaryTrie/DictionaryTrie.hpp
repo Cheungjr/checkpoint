@@ -20,6 +20,8 @@ using namespace std;
 
 /**
  * The class for a dictionary ADT, implemented as ternary search tree.
+ * TST can insert words that are not currently in the dic can do prediction
+ * based on given prefix or pattern
  */
 class DictionaryTrie {
   private:
@@ -39,19 +41,11 @@ class DictionaryTrie {
 	  freq = 0;
 	  maxBelow = 0;
 	};
-
       
     };
   
   //root node of Dictionary.
   TrieNode * root;
-   /*
-    //sort for min heap
-    struct compareMin{
-      bool operator()(const pair<string, int>&i, const pair<string, int>&j)const{
-        return make_pair(-i.second,i.first) > make_pair(-j.second,j.first);
-      }
-    }; */
     struct compareMin{
       bool operator()(const pair<string, int>&i, const pair<string, int>&j)const{
         if( i.second != j.second ){
@@ -115,17 +109,12 @@ class DictionaryTrie {
    * return: void
    */
     void completionH( TrieNode* node, string prefix,
-	             priority_queue <pair<string,int>, vector<pair<string,int>>,compareMin> &preComple,
-                     priority_queue <int, vector<int>, compareMinH> & maxList,
+    	priority_queue <pair<string,int>, vector<pair<string,int>>,compareMin> 
+	&preComple, priority_queue <int, vector<int>, compareMinH> & maxList,
 	                 bool first, int maxium, int numC ){
 
       if(!node) { return; }
       if(node->maxBelow < maxList.top()){ return; }
-
-      /*
-      if( preComple.size() > numC ){
-	preComple.pop(); //pop the smallest(min heap).
-      }*/
 
       //add next max into pq.
       //find the guess best n freq	
@@ -355,7 +344,7 @@ class DictionaryTrie {
     vector<string> predictCompletions(string prefix,
                                       unsigned int numCompletions);
 
-    /* TODO: add function header */
+    /* predict certain pattern of words */
     vector<string> predictUnderscores(string pattern,
                                       unsigned int numCompletions);
 

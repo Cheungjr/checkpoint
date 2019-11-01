@@ -155,7 +155,7 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
   }
   if(i >= length) { return predict; }
 
-  priority_queue < pair<string,int>, vector<pair<string,int>>, compareMin > compleQ;
+  priority_queue <pair<string,int>,vector<pair<string,int>>,compareMin> compleQ;
   //maxList is a min heap.
   priority_queue <int,vector<int>, compareMinH > maxList;
   
@@ -228,7 +228,7 @@ std::vector<string> DictionaryTrie::predictUnderscores(
     } 
   }
 
-    return preUnderscore;
+  return preUnderscore;
 }
 
 
