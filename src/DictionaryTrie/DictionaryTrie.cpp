@@ -49,11 +49,6 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
   int i = 0;
   while( curr&& i < word.length() ){
     char s = word[i];
-    //maxBelow update
-    if( curr->maxBelow <= freq ){
-      curr->maxBelow = freq;
-    }
-
 
     if( curr->data < s ){
       if(! curr->right ){
@@ -70,9 +65,13 @@ bool DictionaryTrie::insert(string word, unsigned int freq) {
 	curr = curr->left;
       }
     }else{
+      //maxBelow update
+      if( curr->maxBelow <= freq ){
+        curr->maxBelow = freq;
+      }
+
       if( i == word.length() - 1 ){
 	curr->freq = freq;
-	curr->maxBelow = freq;
 	return true;
       }
       if( curr->mid){
@@ -161,12 +160,7 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
   priority_queue <int,vector<int>, compareMinH > maxList;
   
   int max;
-  if(anchor->mid){
-    max = anchor->mid->maxBelow;
-  }else{
-    max = anchor->maxBelow;
-  }
-  maxList.push( max );
+  maxList.push( -1 );
 
   completionH( anchor, prefix, compleQ, maxList, true, max,numCompletions );
 
@@ -217,18 +211,9 @@ std::vector<string> DictionaryTrie::predictUnderscores(
   vector<TrieNode*> anchors;
   string result = "";
   char flag = '_';
-  //call findNode helper to find all the anchor nodes
-  //if( pattern[0] == flag ){
- //   findNode( pattern[0], root, anchors, true );
- // }else{
- //   findNode( pattern[0], root, anchors, false );
- // }
 
-  //call helper on all the anchor nodes
-  //for( int i = 0; i < anchors.size(); i++ ){
-  //  underscoreHelper( anchors[i], pattern, 0, result, flag, compleList );
-  //} 
-    underscoreHelper( root, pattern, 0, result, flag, compleList );
+  //call helper method
+  underscoreHelper( root, pattern, 0, result, flag, compleList );
 
   //sort the compleList
   sort( compleList.begin(), compleList.end(), comparePair );
