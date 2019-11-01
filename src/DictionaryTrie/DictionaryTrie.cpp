@@ -172,16 +172,22 @@ vector<string> DictionaryTrie::predictCompletions(string prefix,
 
   //push most frequent words into the list.
   int lenQ = compleQ.size();
+  vector< pair<string,int> > r;
+  for( int i = 0; i < lenQ; i ++){
+    r.push_back( compleQ.top() );
+    compleQ.pop();
+  }
 
-  if( lenQ < numCompletions ){
-    for( int i = 0; i < lenQ; i++ ){
-      predict.push_back( compleQ.top().first );
-      compleQ.pop();
+  reverse( r.begin(), r.end() );
+  int lenR = r.size();
+
+  if( lenR < numCompletions ){
+    for( int i = 0; i < lenR; i++ ){
+      predict.push_back( r[i].first );
     }
   }else{
     for( int i = 0; i < numCompletions; i ++ ){
-      predict.push_back( compleQ.top().first );
-      compleQ.pop();
+      predict.push_back( r[i].first );
     } 
   }
 

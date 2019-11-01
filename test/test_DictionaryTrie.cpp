@@ -231,6 +231,7 @@ TEST(DictTrieTests, AUTOCOMPLE_SAME_FREQ) {
 
 
     autoComplete = dict.predictCompletions("that",3);
+    ASSERT_EQ( autoComplete.size(), 3);
 
     ASSERT_EQ(autoComplete[0], "thatand" );
     ASSERT_EQ(autoComplete[1], "thatant" );
